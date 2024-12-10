@@ -1,24 +1,30 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviour
 {
     public static PlayerStats Instance; // Singleton instance for global access
 
-    public float baseSpeed = 10f;       // Base movement speed
-    private float currentSpeed;         // Current movement speed
-    [SerializeField] private int foodPoints = -5; // Initial food points (now visible in Inspector)
-    [SerializeField] private int currency = 1000; // Initial currency (now visible in Inspector)
-    public CharacterController controller; // Reference to CharacterController
+    [SerializeField] private float baseSpeed = 10f;   // Base movement speed
+    [SerializeField] public float currentSpeed;      // Current movement speed (visible in Inspector)
+    [SerializeField] private int foodPoints = 1;      // Initial food points (visible in Inspector)
+    [SerializeField] private int currency = 1000;     // Initial currency (visible in Inspector)
+    public CharacterController controller;            // Reference to CharacterController
 
-    public float gravity = -9.81f;      // Gravity for the player
-    public float jumpHeight = 2f;       // Jump height
+    [Header("Player Physics")] // Add grouping in Inspector for clarity
+    public float gravity = -9.81f;
+    public float jumpHeight = 2f;
 
-    private Vector3 velocity;           // Player's velocity for gravity
-    public Transform groundCheck;       // Transform to check if the player is grounded
-    public float groundDistance = 0.4f; // Radius of ground check sphere
-    public LayerMask groundMask;        // LayerMask to identify ground
+    [Header("Scene Transition")]
+    public Transform defaultSpawnPoint;               // Default spawn point if none specified for a scene
+    public Transform[] sceneSpawnPoints;              // Array to assign spawn points for specific scenes
 
-    private bool isGrounded;            // Whether the player is grounded
+    private Vector3 velocity;
+    public Transform groundCheck;
+    public float groundDistance = 0.4f;
+    public LayerMask groundMask;
+
+    private bool isGrounded;
 
     void Awake()
     {
@@ -37,11 +43,44 @@ public class PlayerStats : MonoBehaviour
     void Start()
     {
         currentSpeed = baseSpeed; // Initialize current speed
+        SceneManager.sceneLoaded += OnSceneLoaded; // Subscribe to scene loaded event
     }
 
     void Update()
     {
         HandleMovement();
+
+        // Debug food points and speed
+        Debug.Log($"Food Points: {foodPoints}, Base Speed: {baseSpeed}, Current Speed: {currentSpeed}");
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded; // Unsubscribe from scene loaded event
+    }
+
+    // Scene loaded handler
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        int sceneIndex = scene.buildIndex;
+
+        // Check if a spawn point is assigned for this scene
+        if (sceneIndex < sceneSpawnPoints.Length && sceneSpawnPoints[sceneIndex] != null)
+        {
+            transform.position = sceneSpawnPoints[sceneIndex].position;
+            Debug.Log($"Player teleported to spawn point for scene: {scene.name}");
+        }
+        else if (defaultSpawnPoint != null)
+        {
+            // Use default spawn point if none is assigned for this scene
+            transform.position = defaultSpawnPoint.position;
+            Debug.Log($"Player teleported to default spawn point for scene: {scene.name}");
+        }
+        else
+        {
+            // Keep player at their current position
+            Debug.Log($"No spawn point specified. Player remains at current position in scene: {scene.name}");
+        }
     }
 
     // Deduct food points at the end of each course
@@ -55,17 +94,29 @@ public class PlayerStats : MonoBehaviour
         {
             ApplyPenalties();
         }
+        else
+        {
+            ResetSpeed();
+        }
     }
 
     // Apply penalties to player stats
     private void ApplyPenalties()
     {
-        // Halve the player's speed if food points are 0 or less
-        currentSpeed = baseSpeed / 2f;
-        Debug.Log("Penalties applied. Speed halved. Current Speed: " + currentSpeed);
+        baseSpeed /= 2f;
+        currentSpeed = baseSpeed;
+        Debug.Log("Penalties applied. Base Speed halved. Current Speed: " + currentSpeed);
     }
 
-    // Add food points (e.g., after purchasing food)
+    // Reset speed to original base speed when penalties are lifted
+    private void ResetSpeed()
+    {
+        baseSpeed = 10f; // Reset base speed to default
+        currentSpeed = baseSpeed;
+        Debug.Log("Speed reset. Base Speed: " + baseSpeed);
+    }
+
+    // Add food points
     public void AddFoodPoints(int amount)
     {
         foodPoints += amount;
@@ -129,8 +180,8 @@ public class PlayerStats : MonoBehaviour
         // Calculate movement direction
         Vector3 move = transform.right * moveX + transform.forward * moveZ;
 
-        // Apply movement
-        controller.Move(move * currentSpeed * Time.deltaTime);
+        // Apply movement using currentSpeed
+        controller.Move(move * (currentSpeed * Time.deltaTime));
 
         // Jump
         if (Input.GetButtonDown("Jump") && isGrounded)
@@ -142,5 +193,20 @@ public class PlayerStats : MonoBehaviour
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
     }
-}
 
+    // Goal collision handling
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Goal"))
+        {
+            // Add currency when reaching the goal
+            AddCurrency(100); // Player gains 100 currency on goal collision
+
+            // Deduct food points when reaching the goal
+            foodPoints -= 1;  // Reduces food points
+
+            // Log the results
+            Debug.Log($"Goal reached! Currency Gained: $100, Food Points Lost: 1");
+        }
+    }
+}
