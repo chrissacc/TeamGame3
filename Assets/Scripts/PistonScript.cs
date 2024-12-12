@@ -13,7 +13,7 @@ public class PistonScript : MonoBehaviour
     public float resetTime = 4f;
     private float resetTimer;
     public float extendTime = 1f;
-    private float extendTimer;
+    public float extendTimer;
     public bool IsActive;
     public bool ReadyToGo = true;
     // Start is called before the first frame update
@@ -36,23 +36,23 @@ public class PistonScript : MonoBehaviour
         if (resetTimer > 0f)
         {
             resetTimer -= Time.fixedDeltaTime;
-            if (resetTimer <= 0)
+            if (resetTimer <= 0f)
             {
                 FinishReset();
+            }
+            else 
+            {
+                ResetMove(Time.fixedDeltaTime);
             }   
         }
         if (extendTimer > 0f)
         {
-            if (extendTimer <= 0)
+            extendTimer -= Time.fixedDeltaTime;
+            if (extendTimer <= 0f)
             {
-
+                FinishExtend();
             }
-        }
-        if (IsActive)
-        {
-            Vector3 newPos = transform.position;
-            newPos = Vector3.MoveTowards(newPos, ExtendedPosition, Time.fixedDeltaTime/extendTime);
-            transform.position = newPos;
+            else ExtendMove(Time.fixedDeltaTime);
         }
     }
     public void Activate()
@@ -69,7 +69,8 @@ public class PistonScript : MonoBehaviour
     public void ResetMove(float timePassed)
     {
         Vector3 newPos = transform.position;
-        newPos = Vector3.MoveTowards(newPos, StartPosition, resetTime/timePassed);
+        newPos = Vector3.Lerp(newPos, StartPosition, timePassed/resetTimer);
+        transform.position = newPos;
     }
     public void FinishReset()
     {
@@ -81,9 +82,11 @@ public class PistonScript : MonoBehaviour
     {
         extendTimer = extendTime;
     }
-    public void ExtendMove()
+    public void ExtendMove(float timePassed)
     {
-
+        Vector3 newPos = transform.position;
+        newPos = Vector3.Lerp(newPos, ExtendedPosition, timePassed/extendTimer);
+        transform.position = newPos;
     }
     public void FinishExtend()
     {

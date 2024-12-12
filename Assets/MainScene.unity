@@ -826,7 +826,9 @@ MonoBehaviour:
   ExtendedPosition: {x: 10.18, y: 11.499999, z: 0.26}
   AutoActivate: 1
   cooldownTime: 4
-  resetTime: 4
+  resetTime: 2
+  extendTime: 0.75
+  extendTimer: 0
   IsActive: 0
   ReadyToGo: 1
 --- !u!23 &928848427499163211
