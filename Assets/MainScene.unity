@@ -803,6 +803,7 @@ GameObject:
   m_Component:
   - component: {fileID: 543450652755415867}
   - component: {fileID: 919132149032978818}
+  - component: {fileID: 919132149032978819}
   m_Layer: 0
   m_Name: PistonHead
   m_TagString: Untagged
@@ -827,10 +828,30 @@ MonoBehaviour:
   AutoActivate: 1
   cooldownTime: 4
   resetTime: 2
-  extendTime: 0.75
-  extendTimer: 0
-  IsActive: 0
+  extendTime: 0.5
   ReadyToGo: 1
+  LaunchAmount: 25
+--- !u!65 &919132149032978819
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132149032978817}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.6579819, y: 2.475171, z: 0.3566823}
+  m_Center: {x: -0.0497694, y: 0.73758554, z: -0.03141284}
 --- !u!23 &928848427499163211
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1097,7 +1118,7 @@ GameObject:
   - component: {fileID: 2073059081054559434}
   m_Layer: 0
   m_Name: TankuUnity
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1196,7 +1217,7 @@ Transform:
   m_GameObject: {fileID: 1697624979720881789}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 10.119613, y: 11.65, z: 0.08128919}
+  m_LocalPosition: {x: 10.119613, y: 11.65, z: -0.11}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

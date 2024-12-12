@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -63,7 +64,10 @@ public class PlayerController : MonoBehaviour
         pieceOfDecay.x = pieceOfDecay.x / 30f;
         pieceOfDecay.z = pieceOfDecay.z / 30f;
         externalVelocity.x = Mathf.MoveTowards(externalVelocity.x, 0f, pieceOfDecay.x);
-        externalVelocity.z = Mathf.MoveTowards(externalVelocity.x, 0f, pieceOfDecay.z);
-        //externalVelocity.y = Mathf.MoveTowards(externalVelocity.x, 0f, ExternalDecay.y);
+        externalVelocity.z = Mathf.MoveTowards(externalVelocity.z, 0f, pieceOfDecay.z);
+    }
+    private void OnCollisionEnter(Collision other) 
+    {
+
     }
 }

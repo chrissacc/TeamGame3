@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class PistonScript : MonoBehaviour
 {
+    private PlayerController PC;
     public Vector3 StartPosition;
     public Vector3 ExtendedPosition;
     public bool AutoActivate = true;
@@ -13,13 +14,14 @@ public class PistonScript : MonoBehaviour
     public float resetTime = 4f;
     private float resetTimer;
     public float extendTime = 1f;
-    public float extendTimer;
-    public bool IsActive;
+    private float extendTimer;
+    private bool IsActive;
     public bool ReadyToGo = true;
+    public float LaunchAmount = 1f;
     // Start is called before the first frame update
     void Start()
     {
-        
+        PC = FindObjectOfType<PlayerController>();
     }
 
     // Update is called once per frame
@@ -92,5 +94,17 @@ public class PistonScript : MonoBehaviour
     {
         extendTimer = 0f;
         BeginReset();
+    }
+
+    private void OnCollisionEnter(Collision other) 
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            Debug.Log("test2");
+            if (IsActive)
+            {
+                PC.addVelocity(-transform.forward * LaunchAmount);
+            }
+        }
     }
 }
