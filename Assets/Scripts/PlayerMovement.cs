@@ -3,36 +3,47 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
-    public CharacterController controller;
-    public float gravity = -9.81f;         // Gravity for the player
-    public float jumpHeight = 2f;          // Jump height
-    private float currentSpeed;            // Current movement speed
+    public Rigidbody rb;                // Reference to the Rigidbody
+    public Transform groundCheck;       // Ground check position
+    public LayerMask groundMask;        // Mask to detect ground layers
 
-    private Vector3 velocity;              // Velocity for gravity calculations
-    public Transform groundCheck;          // Ground check position
-    public float groundDistance = 0.4f;    // Radius for ground check
-    public LayerMask groundMask;           // Mask to detect ground layers
-    private bool isGrounded;               // Is player grounded?
+    public float gravity = -9.81f;      // Gravity value
+    public float groundDistance = 0.4f; // Radius for ground check
+    private Vector3 velocity;           // Velocity for gravity calculations
+
+    private bool isGrounded;            // Is the player grounded?
+
+    private PlayerStats playerStats;    // Reference to the PlayerStats script
+    private float currentSpeed;         // Player's current speed (updated dynamically)
+
+    // Speed reduction when colliding with a StickyWall
+    private float reducedSpeed;         // Speed while on StickyWall
+    private bool isOnStickyWall = false; // Is the player on a sticky wall?
 
     void Start()
     {
-        currentSpeed = PlayerStats.Instance.currentSpeed; // Get initial speed from PlayerStats
+        // Initialize the reference to PlayerStats
+        playerStats = PlayerStats.Instance;
+
+        // Ensure the Rigidbody is properly assigned
+        if (rb == null)
+        {
+            rb = GetComponent<Rigidbody>();
+        }
+
+        // Set the initial speed to currentSpeed from PlayerStats
+        currentSpeed = playerStats.currentSpeed;
+        reducedSpeed = currentSpeed * 0.5f; // Example slow-down factor
     }
 
     void Update()
     {
-        HandleMovement();
-    }
-
-    // Set the movement speed from the PlayerStats script
-    public void SetSpeed(float speed)
-    {
-        currentSpeed = speed;
+        HandleMovement(); // Handle player movement
     }
 
     private void HandleMovement()
     {
-        // Ground check
+        // Ground check using a small sphere radius
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         if (isGrounded && velocity.y < 0)
@@ -40,11 +51,10 @@ public class PlayerMovement : MonoBehaviour
             velocity.y = -2f; // Reset falling velocity when grounded
         }
 
-        // Get input for movement using arrow keys
+        // Movement input
         float moveX = 0f;
         float moveZ = 0f;
 
-        // Arrow keys input for movement
         if (Input.GetKey(KeyCode.UpArrow)) moveZ = 1f;
         if (Input.GetKey(KeyCode.DownArrow)) moveZ = -1f;
         if (Input.GetKey(KeyCode.LeftArrow)) moveX = -1f;
@@ -53,17 +63,42 @@ public class PlayerMovement : MonoBehaviour
         // Calculate movement direction
         Vector3 move = transform.right * moveX + transform.forward * moveZ;
 
-        // Apply movement using current speed
-        controller.Move(move * (currentSpeed * Time.deltaTime));
+        // Apply movement using the current speed (which may be modified by StickyWall)
+        rb.MovePosition(rb.position + move * (currentSpeed * Time.deltaTime));
 
         // Jump logic
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            velocity.y = Mathf.Sqrt(playerStats.currentJumpHeight * -2f * gravity); // Use PlayerStats jump height
         }
 
-        // Apply gravity
+        // Apply gravity using Rigidbody
         velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+        rb.MovePosition(rb.position + velocity * Time.deltaTime);
+
+        // Knockback logic
+        if (playerStats.currentKnockback > 0f && !isGrounded)
+        {
+            Vector3 knockbackForce = transform.forward * playerStats.currentKnockback; // Apply knockback
+            rb.MovePosition(rb.position + knockbackForce * Time.deltaTime);
+
+            // Reduce knockback over time
+            playerStats.currentKnockback = Mathf.Max(playerStats.currentKnockback - Time.deltaTime * 5f, 0f);
+        }
+    }
+
+    // Method to reduce speed when colliding with StickyWall
+    public void OnStickyWallEnter()
+    {
+        isOnStickyWall = true;
+        currentSpeed = reducedSpeed; // Set speed to reduced value
+    }
+
+    // Method to restore normal speed when exiting StickyWall
+    public void OnStickyWallExit()
+    {
+        isOnStickyWall = false;
+        currentSpeed = playerStats.currentSpeed; // Restore original speed
     }
 }
+
