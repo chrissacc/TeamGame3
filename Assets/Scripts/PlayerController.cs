@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public Vector3 tempAddForce;
+    public float jumpAmount = 5f;
     public float speed = 1f;
     private Rigidbody RB;
     private Vector3 direction; //direction the player is moving this frame
@@ -22,7 +23,7 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            addVelocity(tempAddForce);
+            RB.AddForce(new Vector3(0f, jumpAmount, 0f), ForceMode.Impulse);
         }
         direction = new Vector3();
         if (Input.GetKey(KeyCode.W))
@@ -60,12 +61,9 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 pieceOfDecay = ExternalDecay;
         pieceOfDecay.x = pieceOfDecay.x / 30f;
-        pieceOfDecay.x = pieceOfDecay.y / 30f;
-        pieceOfDecay.x = pieceOfDecay.z / 30f;
-        
+        pieceOfDecay.z = pieceOfDecay.z / 30f;
         externalVelocity.x = Mathf.MoveTowards(externalVelocity.x, 0f, pieceOfDecay.x);
         externalVelocity.z = Mathf.MoveTowards(externalVelocity.x, 0f, pieceOfDecay.z);
         //externalVelocity.y = Mathf.MoveTowards(externalVelocity.x, 0f, ExternalDecay.y);
-
     }
 }
