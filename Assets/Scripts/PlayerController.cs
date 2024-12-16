@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
     private bool clickedJump;
     private bool falling;
     private float prevYvel;
+    private float StunAmount;
+    private float StunDuration;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +29,15 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (StunDuration > 0f)
+        {
+            StunDuration -= Time.deltaTime;
+            if (StunDuration <= 0f) 
+            {
+                StunDuration = 0f;
+                StunAmount = 0f;
+            }
+        }
         if (Input.GetKey(KeyCode.Space))
         {
             clickedJump = true;
@@ -52,13 +63,13 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (RB.velocity.y > -.05f && RB.velocity.y < .05f) 
+        if (RB.velocity.y > -.1f && RB.velocity.y < .1f) 
         {
             if (prevYvel > -.05f && prevYvel < .05f) canJump = true;
             else canJump = false;
         }
         else canJump = false;
-        Vector3 movementVelocity = direction.normalized * speed;
+        Vector3 movementVelocity = direction.normalized * speed * (1 - StunAmount);
         Vector3 totalVelocity = movementVelocity + externalVelocity;
         RB.velocity = new Vector3(totalVelocity.x, RB.velocity.y, totalVelocity.z);
         VelocityDecay();
@@ -86,5 +97,10 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionEnter(Collision other) 
     {
 
+    }
+    public void StunPlayer(float length, float strength) //a strength of 1 means cannot move at all 
+    {
+        if (strength > StunAmount) StunAmount = strength;
+        if (length > StunDuration) StunDuration = length;  
     }
 }
