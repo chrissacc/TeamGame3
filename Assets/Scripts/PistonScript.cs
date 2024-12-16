@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using TMPro.Examples;
 using UnityEngine;
 
 public class PistonScript : MonoBehaviour
@@ -8,6 +9,7 @@ public class PistonScript : MonoBehaviour
     private PlayerController PC;
     public Vector3 StartPosition;
     public Vector3 ExtendedPosition;
+    public bool AutoDeterminePositions;
     public bool AutoActivate = true;
     public float cooldownTime = 4f;
     private float cooldownTimer;
@@ -22,6 +24,7 @@ public class PistonScript : MonoBehaviour
     void Start()
     {
         PC = FindObjectOfType<PlayerController>();
+        if (AutoDeterminePositions) DeterminePositions();
     }
 
     // Update is called once per frame
@@ -66,19 +69,19 @@ public class PistonScript : MonoBehaviour
     }
     public void BeginReset()
     {
+        IsActive = false;
         resetTimer = resetTime;
     }
     public void ResetMove(float timePassed)
     {
-        Vector3 newPos = transform.position;
+        Vector3 newPos = transform.localPosition;
         newPos = Vector3.Lerp(newPos, StartPosition, timePassed/resetTimer);
-        transform.position = newPos;
+        transform.localPosition = newPos;
     }
     public void FinishReset()
     {
         ReadyToGo = true;
         resetTimer = 0f;
-        IsActive = false;
     }
     public void BeginExtend()
     {
@@ -86,9 +89,9 @@ public class PistonScript : MonoBehaviour
     }
     public void ExtendMove(float timePassed)
     {
-        Vector3 newPos = transform.position;
+        Vector3 newPos = transform.localPosition;
         newPos = Vector3.Lerp(newPos, ExtendedPosition, timePassed/extendTimer);
-        transform.position = newPos;
+        transform.localPosition = newPos;
     }
     public void FinishExtend()
     {
@@ -106,5 +109,11 @@ public class PistonScript : MonoBehaviour
                 PC.addVelocity(-transform.forward * LaunchAmount);
             }
         }
+    }
+    private void DeterminePositions()
+    {
+        StartPosition = transform.localPosition;
+        ExtendedPosition = StartPosition;
+        ExtendedPosition.x = ExtendedPosition.x + -3.75f;
     }
 }

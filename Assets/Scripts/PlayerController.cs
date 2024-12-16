@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -13,6 +14,10 @@ public class PlayerController : MonoBehaviour
     private Vector3 direction; //direction the player is moving this frame
     public Vector3 ExternalDecay; //How much the external velocity should decrease every second 
     public Vector3 externalVelocity; //How much velocity outside of movement should be affecting the player. Includes jumping
+    public bool canJump;
+    private bool clickedJump;
+    private bool falling;
+    private float prevYvel;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,9 +27,9 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space))
         {
-            RB.AddForce(new Vector3(0f, jumpAmount, 0f), ForceMode.Impulse);
+            clickedJump = true;
         }
         direction = new Vector3();
         if (Input.GetKey(KeyCode.W))
@@ -47,10 +52,22 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (RB.velocity.y > -.05f && RB.velocity.y < .05f) 
+        {
+            if (prevYvel > -.05f && prevYvel < .05f) canJump = true;
+            else canJump = false;
+        }
+        else canJump = false;
         Vector3 movementVelocity = direction.normalized * speed;
         Vector3 totalVelocity = movementVelocity + externalVelocity;
         RB.velocity = new Vector3(totalVelocity.x, RB.velocity.y, totalVelocity.z);
         VelocityDecay();
+        if (clickedJump) 
+        {
+            clickedJump = false;
+            if (canJump) RB.AddForce(new Vector3(0f, jumpAmount, 0f), ForceMode.Impulse);
+        }
+        prevYvel = RB.velocity.y;
     }
 
     public void addVelocity(Vector3 amount)
