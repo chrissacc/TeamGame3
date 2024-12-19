@@ -1,31 +1,39 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // For scene transitions
+using UnityEngine.SceneManagement;
 
 public class EndCourse : MonoBehaviour
 {
-    [SerializeField] private string pointSelectionSceneName = "PointSelection"; // Scene to transition to
-    [SerializeField] private int currencyReward = 100; // Currency to be rewarded at the end of the course
+    [SerializeField] private string pointSelectionSceneName = "PointSelection";
+    [SerializeField] private int currencyReward = 100;
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player")) // Check if the colliding object is the player
+        Debug.Log($"OnTriggerEnter detected: {other.name}");
+        
+        if (other.CompareTag("Player"))
         {
-            PlayerStats.Instance.EndCourse(); // Trigger the EndCourse logic
-            RewardPlayerCurrency(); // Add currency reward to the player
-            LoadPointSelectionScene(); // Transition to the point selection scene
+            if (PlayerStats.Instance == null)
+            {
+                Debug.LogError("PlayerStats.Instance is null. Ensure PlayerStats script is attached and initialized.");
+                return;
+            }
+            
+            Debug.Log("Player reached goal. Rewarding currency...");
+            PlayerStats.Instance.EndCourse();
+            RewardPlayerCurrency();
+            LoadPointSelectionScene();
         }
     }
 
-    // Adds the reward currency to the player
     private void RewardPlayerCurrency()
     {
-        PlayerStats.Instance.AddCurrency(currencyReward); // Add the specified currency amount
-        Debug.Log("Currency rewarded: $" + currencyReward);
+        Debug.Log($"Rewarding player: ${currencyReward}");
+        PlayerStats.Instance.AddCurrency(currencyReward);
     }
 
-    // Load the point selection scene
     private void LoadPointSelectionScene()
     {
+        Debug.Log($"Loading scene: {pointSelectionSceneName}");
         SceneManager.LoadScene(pointSelectionSceneName);
     }
 }
