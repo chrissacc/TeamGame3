@@ -103,7 +103,6 @@ public class PistonScript : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            Debug.Log("test2");
             if (IsActive)
             {
                 PC.addVelocity(-transform.forward * LaunchAmount);

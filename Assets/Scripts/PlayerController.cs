@@ -23,10 +23,16 @@ public class PlayerController : MonoBehaviour
     private float prevYvel;
     private float StunAmount;
     private float StunDuration;
+    private float CurrentRot;
+    public GameObject body;
+    public GameObject legs;
+    private KillPlayer KP;
+    public int DeathsonLevel = 0;
 
     // Start is called before the first frame update
     void Start()
     {
+        KP = FindObjectOfType<KillPlayer>();
         playerStats = PlayerStats.Instance;
         RB = GetComponent<Rigidbody>();
 
@@ -72,10 +78,22 @@ public class PlayerController : MonoBehaviour
         {
             direction.x += -1f;
         }
+        if (direction.x > 0f && direction.z == 0f) CurrentRot = 90f;
+        else if (direction.x < 0f && direction.z == 0f) CurrentRot = -90f;
+        else if (direction.z > 0f && direction.x == 0f) CurrentRot = 0f;
+        else if (direction.z < 0f && direction.x == 0f) CurrentRot = 180f;
+
+        else if (direction.x > 0f && direction.z > 0f) CurrentRot = 45f;
+        else if (direction.x < 0f && direction.z > 0f) CurrentRot = -45f;
+        else if (direction.x > 0f && direction.z < 0f) CurrentRot = 135f;
+        else if (direction.x < 0f && direction.z < 0f) CurrentRot = 225f;
+
+        if (direction.magnitude == 0f) CurrentRot = 0f;
     }
 
     private void FixedUpdate()
     {
+
         // Determine if player can jump (based on their Y velocity)
         if (RB.velocity.y > -.1f && RB.velocity.y < .1f)
         {
@@ -98,6 +116,8 @@ public class PlayerController : MonoBehaviour
         }
 
         prevYvel = RB.velocity.y;
+        body.transform.localEulerAngles = new Vector3(0f, CurrentRot, 0f);
+        legs.transform.localEulerAngles = new Vector3(0f, CurrentRot, 0f);
     }
 
     public void addVelocity(Vector3 amount)
@@ -116,6 +136,11 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
+        if (other.gameObject.CompareTag("RestartObject"))
+        {
+            DeathsonLevel++;
+            KP.RespawnPlayer();
+        }
         // Apply knockback when colliding with anything that can apply knockback
         if (other.relativeVelocity.magnitude > 1f) // If the collision is strong enough
         {
