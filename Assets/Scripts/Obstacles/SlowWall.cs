@@ -6,7 +6,7 @@ public class StickyWall : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        PlayerMovement player = collision.collider.GetComponent<PlayerMovement>();
+        PlayerController player = collision.collider.GetComponent<PlayerController>();
         if (player != null)
         {
             // Call method to reduce player's speed when colliding with sticky wall
@@ -16,7 +16,7 @@ public class StickyWall : MonoBehaviour
 
     private void OnCollisionExit(Collision collision)
     {
-        PlayerMovement player = collision.collider.GetComponent<PlayerMovement>();
+        PlayerController player = collision.collider.GetComponent<PlayerController>();
         if (player != null)
         {
             // Call method to restore player's speed when exiting collision with sticky wall

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,7 +10,7 @@ public class PlayerStats : MonoBehaviour
     [Header("Knockback and Jump Stats")]
     [SerializeField] private float baseKnockback = 1f; // Base knockback value
     [SerializeField] public float currentKnockback;   // Current knockback (visible in Inspector)
-    [SerializeField] private float baseJumpHeight = 2f; // Base jump height value
+    [SerializeField] private float baseJumpHeight = 10f; // Base jump height value
     [SerializeField] public float currentJumpHeight;   // Current jump height (visible in Inspector)
     [SerializeField] private int foodPoints = 1;      // Initial food points (visible in Inspector)
     [SerializeField] private int drinkPoints = 1;     // Initial drink points (visible in Inspector)
@@ -20,6 +21,10 @@ public class PlayerStats : MonoBehaviour
     [Header("Scene Transition")]
     public Transform defaultSpawnPoint;               // Default spawn point if none specified for a scene
     public Transform[] sceneSpawnPoints;              // Array to assign spawn points for specific scenes
+
+    private float knockbackDuration; // Duration of knockback
+    private bool isKnockedBack = false; // Flag to check if player is in knockback
+    private Rigidbody RB; // Rigidbody reference for applying knockback
 
     void Awake()
     {
@@ -36,10 +41,11 @@ public class PlayerStats : MonoBehaviour
 
     void Start()
     {
-        currentSpeed = baseSpeed; 
-        currentKnockback = baseKnockback; 
-        currentJumpHeight = baseJumpHeight; 
-        SceneManager.sceneLoaded += OnSceneLoaded; 
+        RB = GetComponent<Rigidbody>(); // Assign Rigidbody
+        currentSpeed = baseSpeed;
+        currentKnockback = baseKnockback;
+        currentJumpHeight = baseJumpHeight;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     void Update()
@@ -117,21 +123,31 @@ public class PlayerStats : MonoBehaviour
         Debug.Log("Base Speed set to Current Speed: " + currentSpeed);
     }
 
-    private void ApplyKnockbackBasedOnArmor()
+    public void ApplyKnockback(Collision other)
     {
-        if (armorPoints > 0)
+        // Only apply knockback if the player is not already in knockback
+        if (!isKnockedBack)
         {
-            currentKnockback = baseKnockback * 2f;
+            // Apply knockback with a strength that is based on player's knockback stat
+            Vector3 knockbackDirection = (transform.position - other.transform.position).normalized;
+            float knockbackStrength = currentKnockback; // Dynamic knockback strength from PlayerStats
+
+            // Apply the knockback force, scaled by the player's knockback stat
+            RB.AddForce(knockbackDirection * knockbackStrength, ForceMode.Impulse);
+
+            // Set the knockback duration and flag
+            knockbackDuration = 1f; // Example knockback duration (adjust as needed)
+            isKnockedBack = true;
+
+            // Optionally, start a coroutine to reset knockback after duration
+            StartCoroutine(ResetKnockbackAfterDuration());
         }
-        else if (armorPoints == 0)
-        {
-            currentKnockback = baseKnockback;
-        }
-        else
-        {
-            currentKnockback = baseKnockback / 2f;
-        }
-        Debug.Log("Knockback: " + currentKnockback);
+    }
+
+    private IEnumerator ResetKnockbackAfterDuration()
+    {
+        yield return new WaitForSeconds(knockbackDuration); // Wait for the knockback duration to finish
+        isKnockedBack = false; // Reset the knockback flag after the duration
     }
 
     private void ApplyJumpHeightBasedOnDrinkPoints()
@@ -223,12 +239,25 @@ public class PlayerStats : MonoBehaviour
         return currency;
     }
 
-    private void OnTriggerEnter(Collider other)
+    // Getter for Knockback Duration
+    public float GetKnockbackDuration()
     {
-        if (other.CompareTag("Goal"))
+        return knockbackDuration;
+    }
+
+    // Apply knockback based on armor points
+    private void ApplyKnockbackBasedOnArmor()
+    {
+        if (armorPoints > 0)
         {
-            AddCurrency(100);
-            EndCourse();
+            // Example: Reduce knockback based on armor points (this is customizable)
+            currentKnockback = baseKnockback * (1f - (armorPoints * 0.1f)); // 10% knockback reduction per armor point
         }
+        else
+        {
+            currentKnockback = baseKnockback;
+        }
+
+        Debug.Log("Knockback based on Armor: " + currentKnockback);
     }
 }
