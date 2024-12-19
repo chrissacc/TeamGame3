@@ -25,6 +25,7 @@ public class PlayerStats : MonoBehaviour
     private float knockbackDuration; // Duration of knockback
     private bool isKnockedBack = false; // Flag to check if player is in knockback
     private Rigidbody RB; // Rigidbody reference for applying knockback
+    private int failCounter = 0; // Tracks failures
 
     void Awake()
     {
@@ -173,8 +174,11 @@ public class PlayerStats : MonoBehaviour
         armorPoints -= 1;
         drinkPoints -= 1;
 
-        Debug.Log($"End of course. Food Points: {foodPoints}, Armor Points: {armorPoints}, Drink Points: {drinkPoints}");
+        // Apply the stats based on updated points.
         ApplyStatsBasedOnPoints();
+
+        // Reset the fail counter only **after** the currency has been updated.
+        Debug.Log($"End of course. Food Points: {foodPoints}, Armor Points: {armorPoints}, Drink Points: {drinkPoints}, Fail Counter: {failCounter}");
     }
 
     public void AddFoodPoints(int amount)
@@ -195,10 +199,41 @@ public class PlayerStats : MonoBehaviour
         Debug.Log("Armor purchased! Current Armor Points: " + armorPoints);
     }
 
-    public void AddCurrency(int amount)
+    public void AddCurrency(int baseAmount)
     {
-        currency += amount;
-        Debug.Log("Currency added. Current Currency: $" + currency);
+        int adjustedCurrency = baseAmount;
+
+        // Adjust currency based on the fail counter.
+        if (failCounter == 1)
+        {
+            adjustedCurrency = Mathf.FloorToInt(baseAmount * 0.75f); // 25% penalty.
+        }
+        else if (failCounter == 2)
+        {
+            adjustedCurrency = Mathf.FloorToInt(baseAmount * 0.5f); // 50% penalty.
+        }
+        else if (failCounter >= 3)
+        {
+            adjustedCurrency = 0; // No currency gained.
+        }
+
+        // Add adjusted currency to the total.
+        currency += adjustedCurrency;
+        Debug.Log($"Currency gained: {adjustedCurrency}. Total currency: {currency}");
+
+        // Reset the fail counter **after** currency is applied.
+        failCounter = 0;
+    }
+
+    public void UpdateFailCounter(int count)
+    {
+        failCounter = count;
+        Debug.Log($"Fail counter updated to: {failCounter}");
+    }
+
+    public int GetFailCounter()
+    {
+        return failCounter;
     }
 
     public void DeductCurrency(int amount)

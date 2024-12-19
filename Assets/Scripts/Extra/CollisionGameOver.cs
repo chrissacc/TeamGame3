@@ -15,6 +15,7 @@ namespace Scenes
             if (collision.gameObject.CompareTag("Player"))
             {
                 failCounter++;
+                PlayerStats.Instance.UpdateFailCounter(failCounter); // Update failCounter in PlayerStats.
 
                 if (failCounter >= 3)
                 {
@@ -35,7 +36,7 @@ namespace Scenes
                     if (playerController != null)
                     {
                         // Reset player's velocity and movement-related values via the PlayerController script
-                        playerController.ResetPlayerState();  // Call ResetPlayerState() to reset the player state
+                        playerController.ResetPlayerState();
                     }
                 }
             }
