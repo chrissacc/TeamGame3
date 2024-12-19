@@ -94,7 +94,6 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-
         // Determine if player can jump (based on their Y velocity)
         if (RB.velocity.y > -.1f && RB.velocity.y < .1f)
         {
@@ -103,8 +102,8 @@ public class PlayerController : MonoBehaviour
         }
         else canJump = false;
 
-        // Use the updated speed from PlayerStats when moving
-        Vector3 movementVelocity = direction.normalized * playerStats.currentSpeed * (1 - StunAmount);
+        // Use the updated speed when moving
+        Vector3 movementVelocity = direction.normalized * currentSpeed * (1 - StunAmount);
         Vector3 totalVelocity = movementVelocity + externalVelocity;
         RB.velocity = new Vector3(totalVelocity.x, RB.velocity.y, totalVelocity.z);
 
@@ -157,43 +156,36 @@ public class PlayerController : MonoBehaviour
     public void OnStickyWallEnter()
     {
         isOnStickyWall = true;
-        currentSpeed = reducedSpeed; // Set speed to reduced value
+        currentSpeed = playerStats.currentSpeed * 0.5f; // Reduce speed by half
+        Debug.Log("Entered Sticky Wall. Current Speed: " + currentSpeed);
     }
 
-    // Method to restore normal speed when exiting StickyWall
     public void OnStickyWallExit()
     {
         isOnStickyWall = false;
-        currentSpeed = playerStats.currentSpeed; // Restore original speed from PlayerStats
+        currentSpeed = playerStats.currentSpeed; // Restore original speed
+        Debug.Log("Exited Sticky Wall. Current Speed: " + currentSpeed);
     }
 
     private void ApplyKnockback(Collision other)
     {
-        // Apply knockback with a strength that is based on player's knockback stat
         Vector3 knockbackDirection = (transform.position - other.transform.position).normalized;
-        float knockbackStrength = playerStats.currentKnockback; // Dynamic knockback strength from PlayerStats
-
-        // Apply the knockback force, scaled by the player's knockback stat
+        float knockbackStrength = playerStats.currentKnockback;
         RB.AddForce(knockbackDirection * knockbackStrength, ForceMode.Impulse);
     }
 
-    // Method to reset the player's state when respawning
     public void ResetPlayerState()
     {
-        // Reset velocity to zero to stop all movement
         RB.velocity = Vector3.zero;
         RB.angularVelocity = Vector3.zero;
 
-        // Reset any movement-related states
         externalVelocity = Vector3.zero;
         direction = Vector3.zero;
         isOnStickyWall = false;
 
-        // Reset stun
         StunAmount = 0f;
         StunDuration = 0f;
 
-        // Restore the original speed
         currentSpeed = playerStats.currentSpeed;
     }
 
@@ -203,6 +195,5 @@ public class PlayerController : MonoBehaviour
         externalVelocity = new Vector3();
         RB.velocity = new Vector3();
         KP.RespawnPlayer();
-
     }
 }
