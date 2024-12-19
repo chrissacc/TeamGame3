@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -138,8 +139,7 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("RestartObject"))
         {
-            DeathsonLevel++;
-            KP.RespawnPlayer();
+            RestartLevel();
         }
         // Apply knockback when colliding with anything that can apply knockback
         if (other.relativeVelocity.magnitude > 1f) // If the collision is strong enough
@@ -195,5 +195,14 @@ public class PlayerController : MonoBehaviour
 
         // Restore the original speed
         currentSpeed = playerStats.currentSpeed;
+    }
+
+    public void RestartLevel()
+    {
+        DeathsonLevel++;
+        externalVelocity = new Vector3();
+        RB.velocity = new Vector3();
+        KP.RespawnPlayer();
+
     }
 }
