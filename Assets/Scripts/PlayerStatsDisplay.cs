@@ -3,12 +3,12 @@ using TMPro;
 
 public class PlayerStatsDisplay : MonoBehaviour
 {
-    // Reference to the UI TextMeshProUGUI component where we will display the stats
+    // text that displays stats
     public TextMeshProUGUI statsText;
 
     void Start()
     {
-        // Ensure TextMeshProUGUI component is assigned
+        // make sure text works
         if (statsText == null)
         {
             Debug.LogError("Stats TextMeshProUGUI is not assigned in the inspector!");
@@ -17,7 +17,7 @@ public class PlayerStatsDisplay : MonoBehaviour
 
     void Update()
     {
-        // Ensure PlayerStats.Instance is available before updating the display
+        // playerstats is available
         if (PlayerStats.Instance != null)
         {
             UpdateStatsDisplay();
@@ -30,13 +30,13 @@ public class PlayerStatsDisplay : MonoBehaviour
 
     private void UpdateStatsDisplay()
     {
-        // Create a string that contains all the stats to display
+        // Create string contains stats to display
         string stats = "Currency: $" + PlayerStats.Instance.GetCurrency() + "\n";
         stats += "Food Points: " + PlayerStats.Instance.GetFoodPoints() + "\n";
         stats += "Drink Points: " + PlayerStats.Instance.GetDrinkPoints() + "\n";
         stats += "Armor Points: " + PlayerStats.Instance.GetArmorPoints() + "\n";
 
-        // Update the TextMeshProUGUI component with the stats string
+        // Update text
         statsText.text = stats;
     }
 }

@@ -3,12 +3,12 @@ using UnityEngine;
 public class WindmillPillar : MonoBehaviour
 {
     [Header("Rotation Settings")]
-    public Vector3 rotationAxis = Vector3.up; // Axis of rotation (e.g., Vector3.up for Y-axis)
-    public float rotationSpeed = 50f;        // Speed of rotation in degrees per second
+    public Vector3 rotationAxis = Vector3.up; // Axis of rotation
+    public float rotationSpeed = 50f;        // Speed of rotation
 
     void Update()
     {
-        // Rotate the windmill pillar around the specified axis
+        // Rotate the windmill 
         transform.Rotate(rotationAxis, rotationSpeed * Time.deltaTime);
     }
 }

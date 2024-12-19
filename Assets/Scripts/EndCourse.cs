@@ -17,20 +17,20 @@ public class EndCourse : MonoBehaviour
                 Debug.LogError("PlayerStats.Instance is null. Ensure PlayerStats script is attached and initialized.");
                 return;
             }
-            
+            //add currency when win on collis
             Debug.Log("Player reached goal. Rewarding currency...");
             PlayerStats.Instance.EndCourse();
             RewardPlayerCurrency();
             LoadPointSelectionScene();
         }
     }
-
+//adds curren to playr
     private void RewardPlayerCurrency()
     {
         Debug.Log($"Rewarding player: ${currencyReward}");
         PlayerStats.Instance.AddCurrency(currencyReward);
     }
-
+    //send to point select screen
     private void LoadPointSelectionScene()
     {
         Debug.Log($"Loading scene: {pointSelectionSceneName}");

@@ -3,9 +3,9 @@ using UnityEngine.SceneManagement;
 
 public class EasyButton : MonoBehaviour
 {
-    [SerializeField] private string sceneName = "MainScene"; // Name of the scene to load
+    [SerializeField] private string sceneName = "MainScene"; // Name of scene load
 
-    // This function is called when the button is pressed
+    // call when button pressed
     public void LoadScene()
     {
         if (!string.IsNullOrEmpty(sceneName))

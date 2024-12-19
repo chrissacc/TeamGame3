@@ -24,16 +24,16 @@ namespace Scenes
         {
             if (_isFlipping)
             {
-                // Rotate towards the target rotation
+                // Rotate towards
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, _targetRotation, flipSpeed * Time.deltaTime);
 
-                // Check if the flip is complete
+                // Check if the flip comp
                 if (transform.rotation == _targetRotation)
                 {
                     _flipTimer -= Time.deltaTime;
                     if (_flipTimer <= 0f)
                     {
-                        // Reset the timer for delay and prepare the next flip
+                        // Reset the timer
                         _flipDelayTimer = flipDelay;
                         _isFlipping = false;
                         _targetRotation = _initialRotation;
@@ -50,7 +50,7 @@ namespace Scenes
                 }
             }
         }
-
+        //set flip time and dur
         private void StartFlipCycle()
         {
             // Set up the next flip

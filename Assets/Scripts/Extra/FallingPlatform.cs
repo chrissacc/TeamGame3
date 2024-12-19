@@ -39,7 +39,7 @@ namespace Scenes
                 DestroyPlatform();
             }
         }
-
+//shake plat
         private void Shake()
         {
             float shakeOffsetX = Mathf.Sin(Time.time * shakeFrequency) * shakeIntensity;
@@ -47,14 +47,14 @@ namespace Scenes
 
             transform.position = _originalPosition + new Vector3(shakeOffsetX, 0, shakeOffsetZ);
         }
-
+//destroy plat on collis
         private void DestroyPlatform()
         {
             gameObject.SetActive(false); // Deactivate the platform
             _isDestroyed = true; // Mark as destroyed
             Debug.Log($"Platform {gameObject.name} destroyed.");
         }
-
+//respawns platforms
         public void RespawnPlatform()
         {
             _isShaking = false;

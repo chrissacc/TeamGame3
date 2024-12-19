@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
     private PlayerStats playerStats;    // Reference to the PlayerStats script
-    private float currentSpeed;         // Player's current speed (updated dynamically)
+    private float currentSpeed;         // Player's current speed
     private float reducedSpeed;         // Speed while on StickyWall
     private bool isOnStickyWall = false; // Is the player on a sticky wall?
     public Vector3 tempAddForce;
@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
         playerStats = PlayerStats.Instance;
         RB = GetComponent<Rigidbody>();
 
-        // Set the initial speed to currentSpeed from PlayerStats
+        // Set speed to currentSpeed from PlayerStats
         currentSpeed = playerStats.currentSpeed;
 
         reducedSpeed = currentSpeed * 0.5f; // Example slow-down factor
@@ -94,7 +94,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Determine if player can jump (based on their Y velocity)
+        // Determine if player can jump
         if (RB.velocity.y > -.1f && RB.velocity.y < .1f)
         {
             if (prevYvel > -.05f && prevYvel < .05f) canJump = true;
@@ -102,7 +102,7 @@ public class PlayerController : MonoBehaviour
         }
         else canJump = false;
 
-        // Use the updated speed when moving
+        // Use updated speed when moving
         Vector3 movementVelocity = direction.normalized * currentSpeed * (1 - StunAmount);
         Vector3 totalVelocity = movementVelocity + externalVelocity;
         RB.velocity = new Vector3(totalVelocity.x, RB.velocity.y, totalVelocity.z);

@@ -3,9 +3,9 @@ using UnityEngine.SceneManagement;
 
 public class HardButton : MonoBehaviour
 {
-    [SerializeField] private string sceneName = "HardLevel"; // Name of the scene to load
+    [SerializeField] private string sceneName = "HardLevel"; // scene name load
 
-    // This function is called when the button is pressed
+    // load scene when button pressed
     public void LoadScene()
     {
         if (!string.IsNullOrEmpty(sceneName))

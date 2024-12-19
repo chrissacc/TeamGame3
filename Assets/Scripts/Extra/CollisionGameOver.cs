@@ -13,7 +13,7 @@ namespace Scenes
         private List<FallingPlatform> fallingPlatforms;
 
         private int failCounter = 0;
-
+//tracks fail counter
         private void OnCollisionEnter(Collision collision)
         {
             if (collision.gameObject.CompareTag("Player"))
@@ -27,6 +27,7 @@ namespace Scenes
                     SceneManager.LoadScene("TestMenu");
                 }
                 else
+                    //respawns player
                 {
                     collision.gameObject.transform.position = respawnPoint.position;
 
@@ -40,7 +41,7 @@ namespace Scenes
                 }
             }
         }
-
+//respawns platforms after player respawn
         private void RespawnPlatforms()
         {
             if (fallingPlatforms == null || fallingPlatforms.Count == 0)

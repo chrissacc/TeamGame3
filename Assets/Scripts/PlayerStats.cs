@@ -19,12 +19,12 @@ public class PlayerStats : MonoBehaviour
     [Header("Player Physics")]
     public float gravity = -9.81f;
     [Header("Scene Transition")]
-    public Transform defaultSpawnPoint;               // Default spawn point if none specified for a scene
-    public Transform[] sceneSpawnPoints;              // Array to assign spawn points for specific scenes
+    public Transform defaultSpawnPoint;               // Default spawn point
+    public Transform[] sceneSpawnPoints;              // Array to assign spawn points
 
     private float knockbackDuration; // Duration of knockback
     private bool isKnockedBack = false; // Flag to check if player is in knockback
-    private Rigidbody RB; // Rigidbody reference for applying knockback
+    private Rigidbody RB; // Rigidbody for applying knockback
     private int failCounter = 0; // Tracks failures
 
     void Awake()
@@ -136,11 +136,11 @@ public class PlayerStats : MonoBehaviour
             // Apply the knockback force, scaled by the player's knockback stat
             RB.AddForce(knockbackDirection * knockbackStrength, ForceMode.Impulse);
 
-            // Set the knockback duration and flag
+            // Set the knockback duration
             knockbackDuration = 1f; // Example knockback duration (adjust as needed)
             isKnockedBack = true;
 
-            // Optionally, start a coroutine to reset knockback after duration
+            // coroutine to reset knockback after duration
             StartCoroutine(ResetKnockbackAfterDuration());
         }
     }
@@ -169,15 +169,15 @@ public class PlayerStats : MonoBehaviour
     }
 
     public void EndCourse()
+        //deducts points
     {
         foodPoints -= 1;
         armorPoints -= 1;
         drinkPoints -= 1;
 
-        // Apply the stats based on updated points.
+        // Apply the stats based points.
         ApplyStatsBasedOnPoints();
-
-        // Reset the fail counter only **after** the currency has been updated.
+        
         Debug.Log($"End of course. Food Points: {foodPoints}, Armor Points: {armorPoints}, Drink Points: {drinkPoints}, Fail Counter: {failCounter}");
     }
 
@@ -203,7 +203,7 @@ public class PlayerStats : MonoBehaviour
     {
         int adjustedCurrency = baseAmount;
 
-        // Adjust currency based on the fail counter.
+        // Adjust currency based on fails
         if (failCounter == 1)
         {
             adjustedCurrency = Mathf.FloorToInt(baseAmount * 0.75f); // 25% penalty.
@@ -217,11 +217,11 @@ public class PlayerStats : MonoBehaviour
             adjustedCurrency = 0; // No currency gained.
         }
 
-        // Add adjusted currency to the total.
+        // Add adjusted currency
         currency += adjustedCurrency;
         Debug.Log($"Currency gained: {adjustedCurrency}. Total currency: {currency}");
 
-        // Reset the fail counter **after** currency is applied.
+        // Reset the fail counter after get currency
         failCounter = 0;
     }
 
@@ -280,7 +280,7 @@ public class PlayerStats : MonoBehaviour
         return knockbackDuration;
     }
 
-    // Apply knockback based on armor points
+    // Apply knockback based armor
     private void ApplyKnockbackBasedOnArmor()
     {
         if (armorPoints > 0)
